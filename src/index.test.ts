@@ -21,20 +21,21 @@ beforeEach(() => {
 
 const cliName = 'cli-name';
 const cliVersion = '1.2.3';
-const pathToTarball = 'path/to/tarball';
+const pathToZip = 'path/to/zip';
 const pathToCLI = 'path/to/cli';
 
-describe.each(['darwin', 'win32', 'linux'])('when OS is %p', (os) => {
+const platforms: NodeJS.Platform[] = ['darwin', 'linux', 'win32'];
+
+describe.each(platforms)('when platform is %p', (os) => {
   beforeEach(() => {
-    mockedOs.platform.mockReturnValueOnce(os as NodeJS.Platform);
-    mockedOs.arch.mockReturnValueOnce('arm64');
+    mockedOs.platform.mockReturnValueOnce(os);
 
     mockedCore.getInput.mockImplementation((input) => {
       switch (input) {
-        case 'cli-version':
-          return cliVersion;
-        case 'cli-name':
+        case 'name':
           return cliName;
+        case 'version':
+          return cliVersion;
         default:
           throw Error(`Invalid input: ${input}`);
       }
@@ -42,34 +43,41 @@ describe.each(['darwin', 'win32', 'linux'])('when OS is %p', (os) => {
   });
 
   it('downloads, extracts, and adds CLI to PATH', async () => {
-    mockedTc.downloadTool.mockResolvedValueOnce(pathToTarball);
-    const extract = os === 'win32' ? mockedTc.extractZip : mockedTc.extractTar;
-    extract.mockResolvedValueOnce(pathToCLI);
+    mockedTc.downloadTool.mockResolvedValueOnce(pathToZip);
+    const isLinux = os === 'linux';
+    if (!isLinux) {
+      mockedTc.extractZip.mockResolvedValueOnce(pathToCLI);
+    }
 
     await run();
 
     expect(mockedTc.downloadTool).toHaveBeenCalledWith(
       expect.stringContaining(
-        `https://github.com/cli/cli/releases/download/v${cliVersion}/gh_${cliVersion}_`,
+        `https://github.com/love2d/love/releases/download/${cliVersion}/love-${cliVersion}-`,
       ),
     );
 
-    expect(extract).toHaveBeenCalledWith(pathToTarball);
-
     expect(mockedExec.exec).toHaveBeenCalledWith('mv', [
-      expect.stringContaining('/bin/gh'),
-      expect.stringContaining(`/bin/${cliName}`),
+      expect.stringContaining('love'),
+      expect.stringContaining(cliName),
     ]);
 
+    if (isLinux) {
+      expect(mockedExec.exec).toHaveBeenCalledWith('chmod', [
+        'a+x',
+        expect.stringContaining(cliName),
+      ]);
+    }
+
     expect(mockedTc.cacheFile).toHaveBeenCalledWith(
-      expect.stringContaining(`/bin/${cliName}`),
+      expect.stringContaining(cliName),
       cliName,
       cliName,
       cliVersion,
     );
 
     expect(mockedCore.addPath).toHaveBeenCalledWith(
-      expect.stringContaining(pathToCLI),
+      expect.stringContaining(!isLinux ? pathToCLI : pathToZip),
     );
   });
 });

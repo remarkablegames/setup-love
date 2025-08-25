@@ -31,24 +31,24 @@ See [action.yml](action.yml)
 
 ## Inputs
 
-### `cli-version`
+### `name`
 
-**Optional**: The CLI [version](https://github.com/cli/cli/releases). Defaults to [`2.49.0`](https://github.com/cli/cli/releases/tag/v2.49.0):
+**Optional**: The CLI name. Defaults to `love`:
 
 ```yaml
 - uses: remarkablegames/setup-love@v1
   with:
-    cli-version: 2.49.0
+    name: love
 ```
 
-### `cli-name`
+### `version`
 
-**Optional**: The CLI name. Defaults to `gh`:
+**Optional**: The CLI [version](https://github.com/love2d/love/releases). Defaults to [`11.5`](https://github.com/love2d/love/releases/tag/11.5):
 
 ```yaml
 - uses: remarkablegames/setup-love@v1
   with:
-    cli-name: gh
+    version: 11.5
 ```
 
 ## License
