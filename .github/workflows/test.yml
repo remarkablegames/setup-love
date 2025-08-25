@@ -1,0 +1,70 @@
+name: test
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: npm
+          node-version-file: .nvmrc
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Lint codebase
+        run: npm run lint
+
+      - name: Check type
+        run: npm run lint:tsc
+
+      - name: Run tests
+        run: npm run test:ci
+
+      - name: Codecov
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  # action should work on a clean machine without building
+  integration:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        version: [2.27.0]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Run action
+        uses: ./
+        with:
+          cli-version: ${{ matrix.version }}
+          cli-name: gh
+
+      - name: Locate binary
+        run: command -v gh
+
+      - name: Check version
+        shell: bash
+        run: |
+          gh --version &> CLI_VERSION
+          if [[ $(cat CLI_VERSION) != *'${{ matrix.version }}'* ]]; then
+            echo 'Version does not match. See version below:'
+            gh --version
+            exit 1
+          fi
+
+      - name: Show help
+        run: gh --help
