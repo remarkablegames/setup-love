@@ -1,22 +1,22 @@
-# github-actions-setup-cli-template
+# setup-love
 
-[![version](https://badgen.net/github/release/remarkablemark/github-actions-setup-cli-template)](https://github.com/remarkablemark/github-actions-setup-cli-template/releases)
-[![build](https://github.com/remarkablemark/github-actions-setup-cli-template/actions/workflows/build.yml/badge.svg)](https://github.com/remarkablemark/github-actions-setup-cli-template/actions/workflows/build.yml)
-[![codecov](https://codecov.io/gh/remarkablemark/github-actions-setup-cli-template/graph/badge.svg?token=PGPJ2Q8HUO)](https://codecov.io/gh/remarkablemark/github-actions-setup-cli-template)
+[![version](https://badgen.net/github/release/remarkablegames/setup-love)](https://github.com/remarkablegames/setup-love/releases)
+[![build](https://github.com/remarkablegames/setup-love/actions/workflows/build.yml/badge.svg)](https://github.com/remarkablegames/setup-love/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/remarkablegames/setup-love/graph/badge.svg?token=PGPJ2Q8HUO)](https://codecov.io/gh/remarkablegames/setup-love)
 
-⚙️ GitHub Actions setup CLI template. Inspired by [github-developer/example-setup-gh](https://github.com/github-developer/example-setup-gh). Template from [remarkablemark/github-actions-typescript-template](https://github.com/remarkablemark/github-actions-typescript-template).
+❤️ Set up your GitHub Actions workflow with [LÖVE](https://love2d.org/).
 
 ## Quick Start
 
 ```yaml
-name: github-actions-setup-cli-template
+name: setup-love
 on: push
 jobs:
-  github-actions-setup-cli-template:
+  setup-love:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup github-actions-setup-cli-template
-        uses: remarkablemark/github-actions-setup-cli-template@v1
+      - name: Setup setup-love
+        uses: remarkablegames/setup-love@v1
 ```
 
 ## Usage
@@ -24,7 +24,7 @@ jobs:
 **Basic:**
 
 ```yaml
-- uses: remarkablemark/github-actions-setup-cli-template@v1
+- uses: remarkablegames/setup-love@v1
 ```
 
 See [action.yml](action.yml)
@@ -36,7 +36,7 @@ See [action.yml](action.yml)
 **Optional**: The CLI [version](https://github.com/cli/cli/releases). Defaults to [`2.49.0`](https://github.com/cli/cli/releases/tag/v2.49.0):
 
 ```yaml
-- uses: remarkablemark/github-actions-setup-cli-template@v1
+- uses: remarkablegames/setup-love@v1
   with:
     cli-version: 2.49.0
 ```
@@ -46,7 +46,7 @@ See [action.yml](action.yml)
 **Optional**: The CLI name. Defaults to `gh`:
 
 ```yaml
-- uses: remarkablemark/github-actions-setup-cli-template@v1
+- uses: remarkablegames/setup-love@v1
   with:
     cli-name: gh
 ```

@@ -1,7 +1,7 @@
 {
-  "name": "github-actions-setup-cli-template",
+  "name": "setup-love",
   "version": "1.0.0-alpha",
-  "description": "GitHub Actions setup CLI template",
+  "description": "Set up your GitHub Actions workflow with LÖVE",
   "author": "Mark <mark@remarkablemark.org>",
   "main": "src/index.ts",
   "scripts": {

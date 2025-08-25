@@ -1,5 +1,5 @@
-name: github-actions-setup-cli-template
-description: GitHub Actions setup CLI template
+name: setup-love
+description: Set up your GitHub Actions workflow with LÖVE
 author: remarkablemark
 inputs:
   cli-version:
