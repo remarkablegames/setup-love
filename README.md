@@ -15,8 +15,11 @@ jobs:
   setup-love:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup setup-love
+      - name: Setup love
         uses: remarkablegames/setup-love@v1
+
+      - name: Display version
+        run: love --version
 ```
 
 ## Usage
@@ -30,16 +33,6 @@ jobs:
 See [action.yml](action.yml)
 
 ## Inputs
-
-### `name`
-
-**Optional**: The CLI name. Defaults to `love`:
-
-```yaml
-- uses: remarkablegames/setup-love@v1
-  with:
-    name: love
-```
 
 ### `version`
 

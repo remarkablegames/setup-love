@@ -1,8 +1,8 @@
-import os from 'os';
+import os from 'node:os';
 
 import { getDownloadObject } from './utils';
 
-jest.mock('os');
+jest.mock('node:os');
 const mockedOs = jest.mocked(os);
 
 const platforms: NodeJS.Platform[] = ['darwin', 'linux', 'win32'];

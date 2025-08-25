@@ -1,4 +1,4 @@
-import { platform } from 'os';
+import { platform } from 'node:os';
 
 /**
  * Gets download object.
@@ -10,7 +10,6 @@ import { platform } from 'os';
  */
 export function getDownloadObject(version: string) {
   let binaryDirectory = '';
-  let extension = '';
   let filename = 'love';
   let url = `https://github.com/love2d/love/releases/download/${version}/love-${version}-`;
 
@@ -21,21 +20,19 @@ export function getDownloadObject(version: string) {
       break;
 
     case 'linux':
-      filename += `-${version}-x86_64.AppImage`;
-      url += 'x86_64.AppImage';
+      binaryDirectory = `love-${version}/src`;
+      url += 'linux-src.tar.gz';
       break;
 
     case 'win32':
       binaryDirectory = `love-${version}-win64`;
-      extension = '.exe';
-      filename += extension;
+      filename += '.exe';
       url += 'win64.zip';
       break;
   }
 
   return {
     binaryDirectory,
-    extension,
     filename,
     url,
   };

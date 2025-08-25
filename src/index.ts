@@ -1,42 +1,64 @@
+import { platform } from 'node:os';
+import { dirname, join } from 'node:path';
+import { chdir } from 'node:process';
+
 import { addPath, getInput, setFailed } from '@actions/core';
 import { exec } from '@actions/exec';
-import { cacheFile, downloadTool, extractZip, find } from '@actions/tool-cache';
-import { dirname, join } from 'path';
+import {
+  cacheFile,
+  downloadTool,
+  extractTar,
+  extractZip,
+  find,
+} from '@actions/tool-cache';
 
 import { getDownloadObject } from './utils';
 
+const TOOL_NAME = 'love';
+
 export async function run() {
   try {
-    // Get the name and version of the tool
-    const cliName = getInput('name');
-    const cliVersion = getInput('version');
-    const toolName = cliName;
+    // Get the version of the tool
+    const version = getInput('version');
 
     // Find previously cached directory (if applicable)
-    let binaryPath = find(toolName, cliVersion);
+    let binaryPath = find(TOOL_NAME, version);
     const isCached = Boolean(binaryPath);
+    const download = getDownloadObject(version);
 
     /* istanbul ignore else */
     if (!isCached) {
       // Download the specific version of the tool
-      const download = getDownloadObject(cliVersion);
       const downloadPath = await downloadTool(download.url);
 
-      // Extract the zipball onto the host runner
-      const toolPath = download.url.endsWith('.zip')
-        ? await extractZip(downloadPath)
-        : downloadPath;
+      // Extract the tarball/zipball onto the host runner
+      const extract = download.url.endsWith('.zip') ? extractZip : extractTar;
+      const toolPath = await extract(downloadPath);
 
       // Get the binary
       const binaryDirectory = join(toolPath, download.binaryDirectory);
-      binaryPath = join(binaryDirectory, `${cliName}${download.extension}`);
+      binaryPath = join(binaryDirectory, download.filename);
 
-      // Rename the binary
-      await exec('mv', [join(binaryDirectory, download.filename), binaryPath]);
+      // Configure and build the binary
+      // https://love2d.org/wiki/Building_L%C3%96VE#Linux_2
+      if (platform() === 'linux') {
+        // Install LÖVE dependencies
+        await exec('sudo', [
+          'apt-get',
+          'install',
+          'libluajit-5.1-dev',
+          'libsdl2-dev',
+          'libopenal-dev',
+          'libfreetype6-dev',
+          'libmodplug-dev',
+          'libvorbis-dev',
+          'libtheora-dev',
+          'libmpg123-dev',
+        ]);
 
-      // Make AppImage executable
-      if (download.filename.endsWith('.AppImage')) {
-        await exec('chmod', ['a+x', binaryPath]);
+        chdir(dirname(binaryDirectory));
+        await exec('./configure', []);
+        await exec('make', []);
       }
     }
 
@@ -46,7 +68,7 @@ export async function run() {
     // Cache the tool
     /* istanbul ignore else */
     if (!isCached) {
-      await cacheFile(binaryPath, cliName, toolName, cliVersion);
+      await cacheFile(binaryPath, download.filename, TOOL_NAME, version);
     }
   } catch (error) {
     if (error instanceof Error) {

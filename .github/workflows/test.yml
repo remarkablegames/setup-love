@@ -53,13 +53,19 @@ jobs:
           version: ${{ matrix.version }}
 
       - name: Locate binary
-        run: command -v love
+        if: matrix.os != 'windows-latest'
+        run: which love
+
+      - name: Locate binary
+        if: matrix.os == 'windows-latest'
+        run: love
 
       - name: Check version
         shell: bash
+        if: matrix.os != 'windows-latest'
         run: |
-          love --version &> CLI_VERSION
-          if [[ $(cat CLI_VERSION) != *'${{ matrix.version }}'* ]]; then
+          love --version &> VERSION
+          if [[ $(cat VERSION) != *'${{ matrix.version }}'* ]]; then
             echo 'Version does not match. See version below:'
             love --version
             exit 1

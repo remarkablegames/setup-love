@@ -3,7 +3,6 @@
 exports[`getDownloadObject when platform is "darwin" gets download object 1`] = `
 {
   "binaryDirectory": "love.app/Contents/MacOS",
-  "extension": "",
   "filename": "love",
   "url": "https://github.com/love2d/love/releases/download/11.4/love-11.4-macos.zip",
 }
@@ -11,17 +10,15 @@ exports[`getDownloadObject when platform is "darwin" gets download object 1`] = 
 
 exports[`getDownloadObject when platform is "linux" gets download object 1`] = `
 {
-  "binaryDirectory": "",
-  "extension": "",
-  "filename": "love-11.4-x86_64.AppImage",
-  "url": "https://github.com/love2d/love/releases/download/11.4/love-11.4-x86_64.AppImage",
+  "binaryDirectory": "love-11.4/src",
+  "filename": "love",
+  "url": "https://github.com/love2d/love/releases/download/11.4/love-11.4-linux-src.tar.gz",
 }
 `;
 
 exports[`getDownloadObject when platform is "win32" gets download object 1`] = `
 {
   "binaryDirectory": "love-11.4-win64",
-  "extension": ".exe",
   "filename": "love.exe",
   "url": "https://github.com/love2d/love/releases/download/11.4/love-11.4-win64.zip",
 }
