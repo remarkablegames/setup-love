@@ -1,63 +1,58 @@
+import { dirname, join } from 'node:path';
+
 import { addPath, getInput, setFailed } from '@actions/core';
 import { exec } from '@actions/exec';
-import {
-  cacheFile,
-  downloadTool,
-  extractTar,
-  extractZip,
-  find,
-} from '@actions/tool-cache';
-import path from 'path';
+import { cacheFile, downloadTool, extractZip, find } from '@actions/tool-cache';
 
-import { getBinaryPath, getDownloadObject } from './utils';
+import { getDownloadObject } from './utils';
 
-const DEFAULT_NAME = 'gh';
+const TOOL_NAME = 'love';
 
 export async function run() {
   try {
-    // Get the version and name of the tool to be installed
-    const cliVersion = getInput('cli-version');
-    const cliName = getInput('cli-name') || DEFAULT_NAME;
-    const toolName = cliName;
+    // Get the version of the tool
+    const version = getInput('version');
 
     // Find previously cached directory (if applicable)
-    let binaryPath = find(toolName, cliVersion);
+    let binaryPath = find(TOOL_NAME, version);
     const isCached = Boolean(binaryPath);
+    const download = getDownloadObject(version);
 
     /* istanbul ignore else */
     if (!isCached) {
-      // Download the specific version of the tool (e.g., tarball/zipball)
-      const download = getDownloadObject(cliVersion);
-      const pathToTarball = await downloadTool(download.url);
+      // Download the specific version of the tool
+      const downloadPath = await downloadTool(download.url);
 
-      // Extract the tarball/zipball onto the host runner
-      const extract = download.url.endsWith('.zip') ? extractZip : extractTar;
-      const extractDirectory = await extract(pathToTarball);
+      // Extract the zipball onto the host runner
+      const toolPath = download.url.endsWith('.zip')
+        ? await extractZip(downloadPath)
+        : downloadPath;
 
       // Get the binary
-      const binaryDirectory = path.join(
-        extractDirectory,
-        download.binaryDirectory,
-      );
-      binaryPath = getBinaryPath(binaryDirectory, cliName);
+      const binaryDirectory = join(toolPath, download.binaryDirectory);
+      binaryPath = join(binaryDirectory, download.filename);
 
-      // Rename the binary
-      /* istanbul ignore else */
-      if (cliName !== DEFAULT_NAME) {
-        await exec('mv', [
-          getBinaryPath(binaryDirectory, DEFAULT_NAME),
-          binaryPath,
-        ]);
+      // Extract the binary on Linux
+      if (download.url.endsWith('.AppImage')) {
+        process.chdir(dirname(toolPath));
+        await exec('chmod', ['+x', toolPath]);
+        await exec(toolPath, ['--appimage-extract']);
+        binaryPath = join(
+          toolPath,
+          '..',
+          download.binaryDirectory,
+          download.filename,
+        );
       }
     }
 
     // Expose the tool by adding it to the PATH
-    addPath(path.dirname(binaryPath));
+    addPath(dirname(binaryPath));
 
     // Cache the tool
     /* istanbul ignore else */
     if (!isCached) {
-      await cacheFile(binaryPath, cliName, toolName, cliVersion);
+      await cacheFile(binaryPath, download.filename, TOOL_NAME, version);
     }
   } catch (error) {
     if (error instanceof Error) {

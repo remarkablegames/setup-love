@@ -41,7 +41,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        version: [2.27.0]
+        version: [11.4]
 
     steps:
       - name: Checkout repository
@@ -50,21 +50,23 @@ jobs:
       - name: Run action
         uses: ./
         with:
-          cli-version: ${{ matrix.version }}
-          cli-name: gh
+          version: ${{ matrix.version }}
 
-      - name: Locate binary
-        run: command -v gh
+      - name: Check binary
+        if: matrix.os != 'windows-latest'
+        run: which love
+
+      - name: Check binary
+        if: matrix.os == 'windows-latest'
+        run: love
 
       - name: Check version
         shell: bash
+        if: matrix.os != 'windows-latest'
         run: |
-          gh --version &> CLI_VERSION
-          if [[ $(cat CLI_VERSION) != *'${{ matrix.version }}'* ]]; then
+          love --version &> VERSION
+          if [[ $(cat VERSION) != *'${{ matrix.version }}'* ]]; then
             echo 'Version does not match. See version below:'
-            gh --version
+            love --version
             exit 1
           fi
-
-      - name: Show help
-        run: gh --help

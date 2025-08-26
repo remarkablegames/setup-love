@@ -15,8 +15,11 @@ jobs:
   setup-love:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup setup-love
+      - name: Setup love
         uses: remarkablegames/setup-love@v1
+
+      - name: Display version
+        run: love --version
 ```
 
 ## Usage
@@ -31,24 +34,14 @@ See [action.yml](action.yml)
 
 ## Inputs
 
-### `cli-version`
+### `version`
 
-**Optional**: The CLI [version](https://github.com/cli/cli/releases). Defaults to [`2.49.0`](https://github.com/cli/cli/releases/tag/v2.49.0):
-
-```yaml
-- uses: remarkablegames/setup-love@v1
-  with:
-    cli-version: 2.49.0
-```
-
-### `cli-name`
-
-**Optional**: The CLI name. Defaults to `gh`:
+**Optional**: The CLI [version](https://github.com/love2d/love/releases). Defaults to [`11.5`](https://github.com/love2d/love/releases/tag/11.5):
 
 ```yaml
 - uses: remarkablegames/setup-love@v1
   with:
-    cli-name: gh
+    version: 11.5
 ```
 
 ## License

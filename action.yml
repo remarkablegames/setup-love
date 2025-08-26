@@ -2,17 +2,13 @@ name: setup-love
 description: Set up your GitHub Actions workflow with LÖVE
 author: remarkablemark
 inputs:
-  cli-version:
+  version:
     description: CLI version
     required: false
-    default: 2.49.0
-  cli-name:
-    description: CLI name
-    required: false
-    default: gh
+    default: 11.5
 runs:
   using: node24
   main: dist/index.js
 branding:
-  icon: activity
-  color: gray-dark
+  icon: heart
+  color: red

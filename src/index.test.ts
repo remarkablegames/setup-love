@@ -1,14 +1,15 @@
+import os from 'node:os';
+
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as tc from '@actions/tool-cache';
-import os from 'os';
 
 import { run } from '.';
 
 jest.mock('@actions/core');
 jest.mock('@actions/exec');
 jest.mock('@actions/tool-cache');
-jest.mock('os');
+jest.mock('node:os');
 
 const mockedCore = jest.mocked(core);
 const mockedExec = jest.mocked(exec);
@@ -19,57 +20,68 @@ beforeEach(() => {
   jest.resetAllMocks();
 });
 
-const cliName = 'cli-name';
+const cliName = 'love';
 const cliVersion = '1.2.3';
-const pathToTarball = 'path/to/tarball';
+const pathToZip = 'path/to/zip';
 const pathToCLI = 'path/to/cli';
+const pathToDownload = 'path/to/download';
 
-describe.each(['darwin', 'win32', 'linux'])('when OS is %p', (os) => {
+const platforms: NodeJS.Platform[] = ['darwin', 'linux', 'win32'];
+
+describe.each(platforms)('when platform is %p', (os) => {
   beforeEach(() => {
-    mockedOs.platform.mockReturnValueOnce(os as NodeJS.Platform);
-    mockedOs.arch.mockReturnValueOnce('arm64');
+    mockedOs.platform.mockReturnValue(os);
 
     mockedCore.getInput.mockImplementation((input) => {
       switch (input) {
-        case 'cli-version':
+        case 'version':
           return cliVersion;
-        case 'cli-name':
-          return cliName;
         default:
           throw Error(`Invalid input: ${input}`);
       }
     });
+
+    jest.spyOn(process, 'chdir');
   });
 
   it('downloads, extracts, and adds CLI to PATH', async () => {
-    mockedTc.downloadTool.mockResolvedValueOnce(pathToTarball);
-    const extract = os === 'win32' ? mockedTc.extractZip : mockedTc.extractTar;
-    extract.mockResolvedValueOnce(pathToCLI);
+    const isLinux = os === 'linux';
+    mockedTc.downloadTool.mockResolvedValueOnce(
+      isLinux ? pathToDownload : pathToZip,
+    );
+    if (!isLinux) {
+      mockedTc.extractZip.mockResolvedValueOnce(pathToCLI);
+    }
 
     await run();
 
+    if (isLinux) {
+      expect(process.chdir).toHaveBeenCalledWith('path/to');
+      [
+        ['chmod', ['+x', pathToDownload]],
+        [pathToDownload, ['--appimage-extract']],
+      ].forEach((params) =>
+        expect(mockedExec.exec).toHaveBeenCalledWith(...params),
+      );
+    }
+
     expect(mockedTc.downloadTool).toHaveBeenCalledWith(
       expect.stringContaining(
-        `https://github.com/cli/cli/releases/download/v${cliVersion}/gh_${cliVersion}_`,
+        `https://github.com/love2d/love/releases/download/${cliVersion}/love-${cliVersion}-`,
       ),
     );
 
-    expect(extract).toHaveBeenCalledWith(pathToTarball);
-
-    expect(mockedExec.exec).toHaveBeenCalledWith('mv', [
-      expect.stringContaining('/bin/gh'),
-      expect.stringContaining(`/bin/${cliName}`),
-    ]);
-
     expect(mockedTc.cacheFile).toHaveBeenCalledWith(
-      expect.stringContaining(`/bin/${cliName}`),
-      cliName,
+      expect.stringContaining(cliName),
+      expect.stringContaining(cliName),
       cliName,
       cliVersion,
     );
 
     expect(mockedCore.addPath).toHaveBeenCalledWith(
-      expect.stringContaining(pathToCLI),
+      isLinux
+        ? 'path/to/squashfs-root/bin'
+        : expect.stringContaining(pathToCLI),
     );
   });
 });
