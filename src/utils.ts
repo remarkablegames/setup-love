@@ -20,8 +20,7 @@ export function getDownloadObject(version: string) {
       break;
 
     case 'linux':
-      binaryDirectory = `love-${version}/src`;
-      url += 'linux-src.tar.gz';
+      url += 'x86_64.AppImage';
       break;
 
     case 'win32':

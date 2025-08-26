@@ -1,5 +1,4 @@
 import os from 'node:os';
-import process from 'node:process';
 
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
@@ -11,15 +10,11 @@ jest.mock('@actions/core');
 jest.mock('@actions/exec');
 jest.mock('@actions/tool-cache');
 jest.mock('node:os');
-jest.mock('node:process', () => ({
-  chdir: jest.fn(),
-}));
 
 const mockedCore = jest.mocked(core);
 const mockedExec = jest.mocked(exec);
 const mockedTc = jest.mocked(tc);
 const mockedOs = jest.mocked(os);
-const mockedProcess = jest.mocked(process);
 
 beforeEach(() => {
   jest.resetAllMocks();
@@ -29,6 +24,7 @@ const cliName = 'love';
 const cliVersion = '1.2.3';
 const pathToZip = 'path/to/zip';
 const pathToCLI = 'path/to/cli';
+const pathToDownload = 'path/to/download';
 
 const platforms: NodeJS.Platform[] = ['darwin', 'linux', 'win32'];
 
@@ -47,36 +43,22 @@ describe.each(platforms)('when platform is %p', (os) => {
   });
 
   it('downloads, extracts, and adds CLI to PATH', async () => {
-    mockedTc.downloadTool.mockResolvedValueOnce(pathToZip);
     const isLinux = os === 'linux';
-    const extract = isLinux ? mockedTc.extractTar : mockedTc.extractZip;
-    extract.mockResolvedValueOnce(pathToCLI);
+    mockedTc.downloadTool.mockResolvedValueOnce(
+      isLinux ? pathToDownload : pathToZip,
+    );
+    if (!isLinux) {
+      mockedTc.extractZip.mockResolvedValueOnce(pathToCLI);
+    }
 
     await run();
 
     if (isLinux) {
-      expect(mockedProcess.chdir).toHaveBeenCalledWith(
-        expect.stringContaining(pathToCLI),
-      );
-
       [
-        [
-          'sudo',
-          [
-            'apt-get',
-            'install',
-            'libluajit-5.1-dev',
-            'libsdl2-dev',
-            'libopenal-dev',
-            'libfreetype6-dev',
-            'libmodplug-dev',
-            'libvorbis-dev',
-            'libtheora-dev',
-            'libmpg123-dev',
-          ],
-        ],
-        ['./configure', []],
-        ['make', []],
+        ['sudo', ['add-apt-repository', 'universe']],
+        ['sudo', ['apt', 'install', 'libfuse2t64']],
+        ['mv', [pathToDownload, 'path/to/love']],
+        ['chmod', ['+x', expect.stringContaining('/love')]],
       ].forEach((params) =>
         expect(mockedExec.exec).toHaveBeenCalledWith(...params),
       );
@@ -96,7 +78,7 @@ describe.each(platforms)('when platform is %p', (os) => {
     );
 
     expect(mockedCore.addPath).toHaveBeenCalledWith(
-      expect.stringContaining(pathToCLI),
+      isLinux ? 'path/to' : expect.stringContaining(pathToCLI),
     );
   });
 });

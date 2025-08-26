@@ -1,16 +1,8 @@
-import { platform } from 'node:os';
 import { dirname, join } from 'node:path';
-import { chdir } from 'node:process';
 
 import { addPath, getInput, setFailed } from '@actions/core';
 import { exec } from '@actions/exec';
-import {
-  cacheFile,
-  downloadTool,
-  extractTar,
-  extractZip,
-  find,
-} from '@actions/tool-cache';
+import { cacheFile, downloadTool, extractZip, find } from '@actions/tool-cache';
 
 import { getDownloadObject } from './utils';
 
@@ -31,34 +23,23 @@ export async function run() {
       // Download the specific version of the tool
       const downloadPath = await downloadTool(download.url);
 
-      // Extract the tarball/zipball onto the host runner
-      const extract = download.url.endsWith('.zip') ? extractZip : extractTar;
-      const toolPath = await extract(downloadPath);
+      // Extract the zipball onto the host runner
+      const toolPath = download.url.endsWith('.zip')
+        ? await extractZip(downloadPath)
+        : downloadPath;
 
       // Get the binary
       const binaryDirectory = join(toolPath, download.binaryDirectory);
       binaryPath = join(binaryDirectory, download.filename);
 
-      // Configure and build the binary
-      // https://love2d.org/wiki/Building_L%C3%96VE#Linux_2
-      if (platform() === 'linux') {
-        // Install LÖVE dependencies
-        await exec('sudo', [
-          'apt-get',
-          'install',
-          'libluajit-5.1-dev',
-          'libsdl2-dev',
-          'libopenal-dev',
-          'libfreetype6-dev',
-          'libmodplug-dev',
-          'libvorbis-dev',
-          'libtheora-dev',
-          'libmpg123-dev',
-        ]);
-
-        chdir(dirname(binaryDirectory));
-        await exec('./configure', []);
-        await exec('make', []);
+      // Rename the binary on Linux
+      if (download.url.endsWith('.AppImage')) {
+        // AppImages require FUSE to run: https://github.com/AppImage/AppImageKit/wiki/FUSE
+        await exec('sudo', ['add-apt-repository', 'universe']);
+        await exec('sudo', ['apt', 'install', 'libfuse2t64']);
+        binaryPath = join(dirname(toolPath), TOOL_NAME);
+        await exec('mv', [toolPath, binaryPath]);
+        await exec('chmod', ['+x', binaryPath]);
       }
     }
 

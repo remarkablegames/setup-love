@@ -52,11 +52,11 @@ jobs:
         with:
           version: ${{ matrix.version }}
 
-      - name: Locate binary
+      - name: Check binary
         if: matrix.os != 'windows-latest'
         run: which love
 
-      - name: Locate binary
+      - name: Check binary
         if: matrix.os == 'windows-latest'
         run: love
 
