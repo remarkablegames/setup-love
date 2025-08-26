@@ -5,7 +5,7 @@ import { platform } from 'node:os';
  *
  * @see {@link https://github.com/love2d/love/releases}
  *
- * @param version - CLI version
+ * @param version - LÖVE version
  * @returns - Download object
  */
 export function getDownloadObject(version: string) {

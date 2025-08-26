@@ -3,7 +3,7 @@ description: Set up your GitHub Actions workflow with LÖVE
 author: remarkablemark
 inputs:
   version:
-    description: CLI version
+    description: LÖVE version
     required: false
     default: 11.5
 runs:

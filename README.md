@@ -36,7 +36,7 @@ See [action.yml](action.yml)
 
 ### `version`
 
-**Optional**: The CLI [version](https://github.com/love2d/love/releases). Defaults to [`11.5`](https://github.com/love2d/love/releases/tag/11.5):
+**Optional**: The LÖVE [version](https://github.com/love2d/love/releases). Defaults to [`11.5`](https://github.com/love2d/love/releases/tag/11.5):
 
 ```yaml
 - uses: remarkablegames/setup-love@v1
