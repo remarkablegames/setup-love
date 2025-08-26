@@ -20,6 +20,7 @@ export function getDownloadObject(version: string) {
       break;
 
     case 'linux':
+      binaryDirectory = 'squashfs-root/bin';
       url += 'x86_64.AppImage';
       break;
 

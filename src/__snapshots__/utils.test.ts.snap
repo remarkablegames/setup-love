@@ -10,7 +10,7 @@ exports[`getDownloadObject when platform is "darwin" gets download object 1`] = 
 
 exports[`getDownloadObject when platform is "linux" gets download object 1`] = `
 {
-  "binaryDirectory": "",
+  "binaryDirectory": "squashfs-root/bin",
   "filename": "love",
   "url": "https://github.com/love2d/love/releases/download/11.4/love-11.4-x86_64.AppImage",
 }

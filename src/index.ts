@@ -32,14 +32,17 @@ export async function run() {
       const binaryDirectory = join(toolPath, download.binaryDirectory);
       binaryPath = join(binaryDirectory, download.filename);
 
-      // Rename the binary on Linux
+      // Extract the binary on Linux
       if (download.url.endsWith('.AppImage')) {
-        // AppImages require FUSE to run: https://github.com/AppImage/AppImageKit/wiki/FUSE
-        await exec('sudo', ['add-apt-repository', 'universe']);
-        await exec('sudo', ['apt', 'install', 'libfuse2t64']);
-        binaryPath = join(dirname(toolPath), TOOL_NAME);
-        await exec('mv', [toolPath, binaryPath]);
-        await exec('chmod', ['+x', binaryPath]);
+        process.chdir(dirname(toolPath));
+        await exec('chmod', ['+x', toolPath]);
+        await exec(toolPath, ['--appimage-extract']);
+        binaryPath = join(
+          toolPath,
+          '..',
+          download.binaryDirectory,
+          download.filename,
+        );
       }
     }
 

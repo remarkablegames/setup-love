@@ -40,6 +40,8 @@ describe.each(platforms)('when platform is %p', (os) => {
           throw Error(`Invalid input: ${input}`);
       }
     });
+
+    jest.spyOn(process, 'chdir');
   });
 
   it('downloads, extracts, and adds CLI to PATH', async () => {
@@ -54,11 +56,10 @@ describe.each(platforms)('when platform is %p', (os) => {
     await run();
 
     if (isLinux) {
+      expect(process.chdir).toHaveBeenCalledWith('path/to');
       [
-        ['sudo', ['add-apt-repository', 'universe']],
-        ['sudo', ['apt', 'install', 'libfuse2t64']],
-        ['mv', [pathToDownload, 'path/to/love']],
-        ['chmod', ['+x', expect.stringContaining('/love')]],
+        ['chmod', ['+x', pathToDownload]],
+        [pathToDownload, ['--appimage-extract']],
       ].forEach((params) =>
         expect(mockedExec.exec).toHaveBeenCalledWith(...params),
       );
@@ -78,7 +79,9 @@ describe.each(platforms)('when platform is %p', (os) => {
     );
 
     expect(mockedCore.addPath).toHaveBeenCalledWith(
-      isLinux ? 'path/to' : expect.stringContaining(pathToCLI),
+      isLinux
+        ? 'path/to/squashfs-root/bin'
+        : expect.stringContaining(pathToCLI),
     );
   });
 });
