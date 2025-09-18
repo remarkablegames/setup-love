@@ -24,7 +24,7 @@ jobs:
 
 ## Usage
 
-**Basic:**
+Set up LÖVE CLI:
 
 ```yaml
 - uses: remarkablegames/setup-love@v1
