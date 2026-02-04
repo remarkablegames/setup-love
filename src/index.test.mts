@@ -1,15 +1,36 @@
-import os from 'node:os';
+import type * as osType from 'node:os';
 
-import * as core from '@actions/core';
-import * as exec from '@actions/exec';
-import * as tc from '@actions/tool-cache';
+import type * as coreType from '@actions/core';
+import type * as execType from '@actions/exec';
+import type * as tcType from '@actions/tool-cache';
+import { jest } from '@jest/globals';
 
-import { run } from '.';
+jest.unstable_mockModule('@actions/core', () => ({
+  getInput: jest.fn(),
+  addPath: jest.fn(),
+  setFailed: jest.fn(),
+}));
 
-jest.mock('@actions/core');
-jest.mock('@actions/exec');
-jest.mock('@actions/tool-cache');
-jest.mock('node:os');
+jest.unstable_mockModule('@actions/exec', () => ({
+  exec: jest.fn(),
+}));
+
+jest.unstable_mockModule('@actions/tool-cache', () => ({
+  downloadTool: jest.fn(),
+  extractZip: jest.fn(),
+  cacheFile: jest.fn(),
+  find: jest.fn(),
+}));
+
+jest.unstable_mockModule('node:os', () => ({
+  platform: jest.fn(),
+}));
+
+const { run } = await import('.');
+const core = (await import('@actions/core')) as typeof coreType;
+const exec = (await import('@actions/exec')) as typeof execType;
+const tc = (await import('@actions/tool-cache')) as typeof tcType;
+const os = (await import('node:os')) as typeof osType;
 
 const mockedCore = jest.mocked(core);
 const mockedExec = jest.mocked(exec);
@@ -28,9 +49,9 @@ const pathToDownload = 'path/to/download';
 
 const platforms: NodeJS.Platform[] = ['darwin', 'linux', 'win32'];
 
-describe.each(platforms)('when platform is %p', (os) => {
+describe.each(platforms)('when platform is %p', (platform) => {
   beforeEach(() => {
-    mockedOs.platform.mockReturnValue(os);
+    mockedOs.platform.mockReturnValue(platform);
 
     mockedCore.getInput.mockImplementation((input) => {
       switch (input) {
@@ -45,7 +66,7 @@ describe.each(platforms)('when platform is %p', (os) => {
   });
 
   it('downloads, extracts, and adds CLI to PATH', async () => {
-    const isLinux = os === 'linux';
+    const isLinux = platform === 'linux';
     mockedTc.downloadTool.mockResolvedValueOnce(
       isLinux ? pathToDownload : pathToZip,
     );
