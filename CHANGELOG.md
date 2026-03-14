@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/remarkablegames/setup-love/compare/v1.0.4...v1.0.5) (2026-03-14)
+
+
+### Build System
+
+* **deps:** bump undici from 6.23.0 to 6.24.0 ([#160](https://github.com/remarkablegames/setup-love/issues/160)) ([3923b2c](https://github.com/remarkablegames/setup-love/commit/3923b2c9e693dad649bd0f3701b245b81ffa5011))
+
 ## [1.0.4](https://github.com/remarkablegames/setup-love/compare/v1.0.3...v1.0.4) (2026-02-04)
 
 
