@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.6](https://github.com/remarkablegames/setup-love/compare/v1.0.5...v1.0.6) (2026-04-23)
+
+
+### Build System
+
+* **deps:** bump @actions/core from 3.0.0 to 3.0.1 ([#188](https://github.com/remarkablegames/setup-love/issues/188)) ([2172aa2](https://github.com/remarkablegames/setup-love/commit/2172aa25457a84e2d13993f9a3e7a35a950f49be))
+
 ## [1.0.5](https://github.com/remarkablegames/setup-love/compare/v1.0.4...v1.0.5) (2026-03-14)
 
 
