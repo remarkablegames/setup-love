@@ -1,6 +1,6 @@
 {
   "name": "setup-love",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Set up your GitHub Actions workflow with LÖVE",
   "author": "Mark <mark@remarkablemark.org>",
   "main": "src/index.ts",
