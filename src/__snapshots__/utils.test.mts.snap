@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`getDownloadObject when platform is "darwin" gets download object 1`] = `
+exports[`getDownloadObject > when platform is darwin > gets download object 1`] = `
 {
   "binaryDirectory": "love.app/Contents/MacOS",
   "filename": "love",
@@ -8,7 +8,7 @@ exports[`getDownloadObject when platform is "darwin" gets download object 1`] = 
 }
 `;
 
-exports[`getDownloadObject when platform is "linux" gets download object 1`] = `
+exports[`getDownloadObject > when platform is linux > gets download object 1`] = `
 {
   "binaryDirectory": "squashfs-root/bin",
   "filename": "love",
@@ -16,7 +16,7 @@ exports[`getDownloadObject when platform is "linux" gets download object 1`] = `
 }
 `;
 
-exports[`getDownloadObject when platform is "win32" gets download object 1`] = `
+exports[`getDownloadObject > when platform is win32 > gets download object 1`] = `
 {
   "binaryDirectory": "love-11.4-win64",
   "filename": "love.exe",

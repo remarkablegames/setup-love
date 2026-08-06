@@ -18,7 +18,7 @@ export async function run() {
     const isCached = Boolean(binaryPath);
     const download = getDownloadObject(version);
 
-    /* istanbul ignore else */
+    /* v8 ignore else */
     if (!isCached) {
       // Download the specific version of the tool
       const downloadPath = await downloadTool(download.url);
@@ -50,11 +50,12 @@ export async function run() {
     addPath(dirname(binaryPath));
 
     // Cache the tool
-    /* istanbul ignore else */
+    /* v8 ignore else */
     if (!isCached) {
       await cacheFile(binaryPath, download.filename, TOOL_NAME, version);
     }
   } catch (error) {
+    /* v8 ignore else */
     if (error instanceof Error) {
       setFailed(error.message);
     }

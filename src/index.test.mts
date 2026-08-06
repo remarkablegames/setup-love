@@ -3,27 +3,26 @@ import type * as osType from 'node:os';
 import type * as coreType from '@actions/core';
 import type * as execType from '@actions/exec';
 import type * as tcType from '@actions/tool-cache';
-import { jest } from '@jest/globals';
 
-jest.unstable_mockModule('@actions/core', () => ({
-  getInput: jest.fn(),
-  addPath: jest.fn(),
-  setFailed: jest.fn(),
+vi.mock('@actions/core', () => ({
+  getInput: vi.fn(),
+  addPath: vi.fn(),
+  setFailed: vi.fn(),
 }));
 
-jest.unstable_mockModule('@actions/exec', () => ({
-  exec: jest.fn(),
+vi.mock('@actions/exec', () => ({
+  exec: vi.fn(),
 }));
 
-jest.unstable_mockModule('@actions/tool-cache', () => ({
-  downloadTool: jest.fn(),
-  extractZip: jest.fn(),
-  cacheFile: jest.fn(),
-  find: jest.fn(),
+vi.mock('@actions/tool-cache', () => ({
+  downloadTool: vi.fn(),
+  extractZip: vi.fn(),
+  cacheFile: vi.fn(),
+  find: vi.fn(),
 }));
 
-jest.unstable_mockModule('node:os', () => ({
-  platform: jest.fn(),
+vi.mock('node:os', () => ({
+  platform: vi.fn(),
 }));
 
 const { run } = await import('.');
@@ -32,13 +31,13 @@ const exec = (await import('@actions/exec')) as typeof execType;
 const tc = (await import('@actions/tool-cache')) as typeof tcType;
 const os = (await import('node:os')) as typeof osType;
 
-const mockedCore = jest.mocked(core);
-const mockedExec = jest.mocked(exec);
-const mockedTc = jest.mocked(tc);
-const mockedOs = jest.mocked(os);
+const mockedCore = vi.mocked(core);
+const mockedExec = vi.mocked(exec);
+const mockedTc = vi.mocked(tc);
+const mockedOs = vi.mocked(os);
 
 beforeEach(() => {
-  jest.resetAllMocks();
+  vi.clearAllMocks();
 });
 
 const cliName = 'love';
@@ -49,7 +48,7 @@ const pathToDownload = 'path/to/download';
 
 const platforms: NodeJS.Platform[] = ['darwin', 'linux', 'win32'];
 
-describe.each(platforms)('when platform is %p', (platform) => {
+describe.each(platforms)('when platform is %s', (platform) => {
   beforeEach(() => {
     mockedOs.platform.mockReturnValue(platform);
 
@@ -62,7 +61,9 @@ describe.each(platforms)('when platform is %p', (platform) => {
       }
     });
 
-    jest.spyOn(process, 'chdir');
+    vi.spyOn(process, 'chdir').mockImplementation(() => {
+      // no-op
+    });
   });
 
   it('downloads, extracts, and adds CLI to PATH', async () => {
